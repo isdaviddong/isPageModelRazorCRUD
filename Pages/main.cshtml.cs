@@ -49,6 +49,29 @@ namespace __NameSpace__.Pages
 
 
         [PageMethod]
+        public static object Edit(dynamic para)
+        {
+            var ID = (int)para.id;
+            var db = new RazorPageDemo.Models.CRMContext();
+            var ret = from c in db.Employee
+                      where c.Id == ID
+                      select c;
+
+            if (ret.Count() == 1)
+            {
+                ret.FirstOrDefault().Address = para.address;
+                ret.FirstOrDefault().IsValid = para.isValid;
+                ret.FirstOrDefault().Memo = para.memo;
+                ret.FirstOrDefault().Name = para.name;
+                ret.FirstOrDefault().Phone = para.address;
+                ret.FirstOrDefault().Title = para.title;
+            }
+
+            db.SaveChanges();
+            return true;
+        }
+
+        [PageMethod]
         public static object DelDataItem(dynamic para)
         {
             var db = new RazorPageDemo.Models.CRMContext();
@@ -67,6 +90,8 @@ namespace __NameSpace__.Pages
 
             return true;
         }
+
+
 
     }
 }

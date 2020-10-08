@@ -58,18 +58,18 @@
 
         function ModalBinding() {
             var ModalEmployeeData = {};
-
+            //新增視窗
             vm2 = new Vue(
                 {
                     el: '#ModalDataFields',
                     data: { item: ModalEmployeeData }
                 });
-
-            //vm3 = new Vue(
-            //    {
-            //        el: '#ModalEditDataFields',
-            //        data: { item: {} }
-            //    });
+            //編輯視窗
+            vm3 = new Vue(
+                {
+                    el: '#ModalEditDataFields',
+                    data: { item: {} }
+                });
 
         }
 
@@ -104,6 +104,17 @@
                             vm2.$data.item.id = ret;
                             //insert UI
                             EmployeeData.push(vm2.$data.item);
+                        }
+                    )
+                }
+            );
+
+                $('#EditDone').click(
+                () => {
+                    //insert to server
+                    ExecutePageMethod("Edit", vm3.$data.item).then(
+                        (ret) => {
+                            //alert('修改成功...');
                         }
                     )
                 }
@@ -223,7 +234,37 @@
     </div>
 
 
+    <!-- 編輯UI - Modal -->
+    <div id="myModalEdit" class="modal fade" role="dialog">
+        <div class="modal-dialog">
 
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title pull-left">修改資料</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div id="ModalEditDataFields" class="modal-body">
+                    <label>Title:</label>
+                    <input class="form-control" type="text" v-model="item.title" />
+                    <label>Name:</label>
+                    <input class="form-control" type="text" v-model="item.name" />
+                    <label>Phone:</label>
+                    <input class="form-control" type="text" v-model="item.phone" />
+                    <label>Address:</label>
+                    <input class="form-control" type="text" v-model="item.address" />
+                    <label>Memo:</label>
+                    <textarea class="form-control" v-model="item.memo"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button id="EditDone" type="button" class="btn btn-primary"
+                            data-dismiss="modal">
+                        儲存
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>
