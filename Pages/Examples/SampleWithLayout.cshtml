@@ -1,0 +1,46 @@
+﻿@page
+@model __NameSpace__.Pages.Examples.SampleWithLayout
+@{
+    ViewData["Title"] = "index";
+}
+
+@section Scripts{
+
+    @*
+        <!-- bootstrap 4.3.1 & Jquery 3.4.1 from CND  -->
+
+        <link rel="stylesheet"
+              href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    *@
+
+    <script src="~/isPageModel.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#ButtonCal').click(function (e) {
+                ExecutePageMethod('CalBmi',
+                    { height: $('#fieldHeight').val(), weight: $('#fieldWeight').val() }
+                ).then(
+                    (ret) => { $('#result').html(ret); }
+                );
+            });
+        });
+    </script>
+}
+
+<div class="row" style="margin:10px">
+    @Html.AntiForgeryToken()
+    <div class="col-6">
+        <h1>BMI計算</h1>
+        <label>身高:</label>
+        <input class="form-control" id="fieldHeight" value="0" />
+        <label>體重:</label>
+        <input class="form-control" id="fieldWeight" value="0" />
+        <br />
+        <button class="btn btn-primary" id="ButtonCal" type="button">計算</button>
+        <br />
+        <span id="result"></span>
+    </div>
+</div>
+

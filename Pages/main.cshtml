@@ -1,0 +1,213 @@
+﻿@page
+@model __NameSpace__.Pages.mainModel
+@{
+    Layout = null;
+    ViewData["Title"] = "index";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title></title>
+    <!-- bootstrap 4.3.1 & Jquery 3.4.1 from CND  -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <!-- 使用vue -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.11/vue.min.js"></script>
+    <!-- 使用data table -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+
+    <script src="~/isPageModel.js"></script>
+    <script>
+        var EmployeeData = {};
+        //Data Bidning
+        function Binding() {
+            vm = new Vue(
+                {
+                    el: '#block1',
+                    data: { items: EmployeeData },
+                    methods: {
+                        Delete: function (item) {
+                            item.isValid = !item.isValid;
+                            return;
+                        },
+                        Edit: function (item) {
+                            //show Edit  Modal
+                            vm3.$data.item = item;
+                            $('#myModalEdit').modal();
+                        },
+                    }
+                });
+
+            //使用data table
+            $('#myTable').DataTable({
+                "info": false, "bLengthChange": false, "pageLength": 5
+            });
+        }
+
+
+        function ModalBinding() {
+            var ModalEmployeeData = {};
+
+            vm2 = new Vue(
+                {
+                    el: '#ModalDataFields',
+                    data: { item: ModalEmployeeData }
+                });
+
+            //vm3 = new Vue(
+            //    {
+            //        el: '#ModalEditDataFields',
+            //        data: { item: {} }
+            //    });
+
+        }
+
+
+        //載入資料
+        function LoadData() {
+            ExecutePageMethod('GetData',
+                {}
+            ).then(
+                (ret) => {
+                    EmployeeData = ret;
+                    //Data Bidning
+                    Binding();
+                    //$("#myTable").animate({ opacity: 1 }, 500);
+                }
+            );
+        }
+
+        $(document).ready(function () {
+            //載入資料並且Binding
+            LoadData();
+
+            //用來做Modal Dialog DataBinding
+            ModalBinding();
+
+            //新增後按下儲存
+            $('#addNewDone').click(
+                () => {
+                    //insert to server
+                    ExecutePageMethod("AddNew", vm2.$data.item).then(
+                        (ret) => {
+                            vm2.$data.item.id = ret;
+                            //insert UI
+                            EmployeeData.push(vm2.$data.item);
+                        }
+                    )
+                }
+            );
+
+            //新增按鈕, 按下後顯示Modal，清空綁定(塑造新資料)
+            $('#Button_Add').click(() => {
+                //show AddNew Modal
+                vm2.$data.item = {};
+                $('#myModalAddNew').modal();
+            });
+
+
+            //棄置不用
+            //get Data when button click
+            $('#ButtonGetData').click(function (e) {
+                ExecutePageMethod('GetData',
+                    {}
+                ).then(
+                    (ret) => {
+                        $('#result').html(
+                            JSON.stringify(ret)
+                        );
+                    }
+                );
+            });
+
+
+        });
+    </script>
+</head>
+<body>
+
+    <div class="row" style="margin:10px">
+        @Html.AntiForgeryToken()
+        <div class="col-12">
+            <h1>資料清單</h1>
+
+            <!--Binding DataTable部分-->
+            <div id="block1" class="row" style="margin: 10px">
+                <div class="col-12">
+                    <table id="myTable" class="cell-border compact stripe" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th>功能</th>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>isValid</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="item in items">
+                                <td>
+                                </td>
+                                <td>{{item.id}}</td>
+                                <td>{{item.title}}</td>
+                                <td>{{item.name}}</td>
+                                <td>{{item.phone}}</td>
+                                <td>{{item.isValid}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 新增 功能按鈕-->
+            <button id="Button_Add" class="btn btn-success">新增</button>
+            <br />
+
+            <span id="result"></span>
+        </div>
+    </div>
+
+
+    <!-- 新增UI - Modal -->
+    <div id="myModalAddNew" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title pull-left">新增資料</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div id="ModalDataFields" class="modal-body">
+                    <label>Title:</label>
+                    <input class="form-control" type="text" v-model="item.title" />
+                    <label>Name:</label>
+                    <input class="form-control" type="text" v-model="item.name" />
+                    <label>Phone:</label>
+                    <input class="form-control" type="text" v-model="item.phone" />
+                    <label>Address:</label>
+                    <input class="form-control" type="text" v-model="item.address" />
+                    <label>Memo:</label>
+                    <textarea class="form-control" v-model="item.memo"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button id="addNewDone" type="button" class="btn btn-primary"
+                            data-dismiss="modal">
+                        儲存
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+</body>
+</html>
