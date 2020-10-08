@@ -21,7 +21,7 @@ namespace __NameSpace__.Pages
             var db = new RazorPageDemo.Models.CRMContext();
             var ret = from c in db.Employee
                       select c;
-         
+
             return ret.ToList();
         }
 
@@ -45,6 +45,27 @@ namespace __NameSpace__.Pages
             db.SaveChanges();
 
             return item.Id;
+        }
+
+
+        [PageMethod]
+        public static object DelDataItem(dynamic para)
+        {
+            var db = new RazorPageDemo.Models.CRMContext();
+
+            var ID = (int)para.id;
+
+            var ret = from c in db.Employee
+                      where c.Id == ID
+                      select c;
+
+            if (ret.Count() == 1)
+            {
+                ret.FirstOrDefault().IsValid = false;
+            }
+            db.SaveChanges();
+
+            return true;
         }
     }
 }
